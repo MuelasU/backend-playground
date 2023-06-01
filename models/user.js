@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const emailValidator = require("email-validator");
 const passwordValidator = require("password-validator");
+const bcrypt = require("bcrypt");
 
 const isValidEmail = async (email) => {
     return emailValidator.validate(email);
@@ -9,8 +10,8 @@ const isValidEmail = async (email) => {
 const isValidPassword = (password) => {
     let validator = new passwordValidator();
     validator
+        .is().max(40)   
         .is().min(8)
-        .is().max(40)
         .has().not().spaces()
         .has().uppercase()
         .has().lowercase()
@@ -32,6 +33,12 @@ const userSchema = mongoose.Schema({
         required: [true, 'Password is required'],
         validate: isValidPassword
     }
+})
+
+userSchema.pre("save", async function(next) {
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
 })
 
 module.exports = mongoose.model("user", userSchema);
