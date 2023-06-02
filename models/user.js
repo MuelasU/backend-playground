@@ -26,6 +26,7 @@ const userSchema = mongoose.Schema({
     email: {
         type: String,
         required: [true, 'Email is required'],
+        unique: true,
         validate: [isValidEmail, 'email is not valid']
     },
     password: {
@@ -40,5 +41,18 @@ userSchema.pre("save", async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
 })
+
+userSchema.statics.login = async function (email, password) {
+    const user = await this.findOne({ email });
+        
+    // check if not null
+    if (!user) throw Error('email not registered');
+    
+    // check if password is correct
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) throw Error('Password is incorrect');
+
+    return user;
+}
 
 module.exports = mongoose.model("user", userSchema);
