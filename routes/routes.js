@@ -1,5 +1,7 @@
 const express = require("express");
 const Player = require("../models/example");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
 
 const router = express.Router();
 

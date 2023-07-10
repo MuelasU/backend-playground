@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const emailValidator = require("email-validator");
 const passwordValidator = require("password-validator");
 const bcrypt = require("bcrypt");
+const profileSchema = require('./profile');
 
 const isValidEmail = async (email) => {
     return emailValidator.validate(email);
@@ -22,7 +23,7 @@ const isValidPassword = (password) => {
     throw new Error(result[0].message);
 }
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -33,6 +34,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'Password is required'],
         validate: isValidPassword
+    },
+    profile: {
+        type: profileSchema,
+        default: {}
     }
 })
 

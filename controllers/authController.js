@@ -15,7 +15,7 @@ const handleErrors = (err) => {
     return obj;
 };
 
-const maxAge = 1 * 60 * 60; // in seconds
+const maxAge = 60; // in seconds
 
 const createToken = (user) => {
     return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: maxAge });
