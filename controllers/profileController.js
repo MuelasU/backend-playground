@@ -11,6 +11,6 @@ module.exports.updateProfile = async (req, res) => {
         const updated = await User.updateOne({_id: res.user._id}, res.user);
         res.status(200).json(updated);
     } catch (err) {
-        console.log(err.message);
+        res.status(400).json({ error: err.message })
     }
 }

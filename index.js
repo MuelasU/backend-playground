@@ -1,10 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv").config();
-const routes = require("./routes/routes");
 const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
-const cookieParser = require("cookie-parser");
+const refreshRoutes = require("./routes/refreshRoutes");
 
 const app = express();
 
@@ -21,13 +20,12 @@ mongoose.connect(mongoString)
 
 // middleware
 app.use(express.json());
-app.use(cookieParser())
 
 
 // routes
-app.use('/teste', routes);
 app.use(authRoutes);
 app.use(profileRoutes);
+app.use(refreshRoutes);
 
 
 // connection
