@@ -10,6 +10,8 @@ const isValidEmail = async (email) => {
 
 const isValidPassword = (password) => {
     let validator = new passwordValidator();
+
+    // build validator with chosen rules
     validator
         .is().max(40)   
         .is().min(8)
@@ -18,8 +20,13 @@ const isValidPassword = (password) => {
         .has().lowercase()
         .has().symbols()
         .has().digits();
+
     const result = validator.validate(password, { details: true });
+    
+    // return true if no error was found
     if (result.length === 0) return true;
+
+    // throw error with first broken rule message
     throw new Error(result[0].message);
 }
 
@@ -28,7 +35,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Email is required'],
         unique: true,
-        validate: [isValidEmail, 'email is not valid']
+        validate: [isValidEmail, 'Email is not valid']
     },
     password: {
         type: String,
@@ -55,7 +62,7 @@ userSchema.statics.login = async function (email, password) {
     
     // check if password is correct
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) throw Error('password is incorrect');
+    if (!isPasswordCorrect) throw new Error('password is incorrect');
 
     return user;
 }

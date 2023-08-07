@@ -14,11 +14,18 @@ module.exports.retrieveUser = (req, res, next) => {
     if (type != 'Bearer') throw new Error('Authorization method must be of type Bearer')
 
     jwt.verify(token, process.env.ACCESS_SECRET, async (err, decoded) => {
-        if (err) throw err; // TokenExpiredError
-        // gets user
-        const user = await User.findById(decoded.id);
-        // send in response
-        res.user = user;
-        next();
+        if (err) {
+            next(err);  // TokenExpiredError
+        } else {
+            try {
+                // gets user
+                const user = await User.findById(decoded.id);
+                // send in response
+                res.user = user;
+                next();
+            } catch (err) {
+                next(err);
+            }
+        }
     });
 }

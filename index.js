@@ -1,9 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
-const refreshRoutes = require("./routes/refreshRoutes");
+const errorHandler = require("./errorHandler");
+require("dotenv").config();
 
 const app = express();
 
@@ -25,7 +25,10 @@ app.use(express.json());
 // routes
 app.use(authRoutes);
 app.use(profileRoutes);
-app.use(refreshRoutes);
+
+
+// error handling
+app.use(errorHandler);
 
 
 // connection

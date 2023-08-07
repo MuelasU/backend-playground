@@ -13,7 +13,7 @@ const createTokens = (user) => {
     };
 }
 
-module.exports.postSingUp = async (req, res) => {
+module.exports.postSingUp = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
@@ -24,11 +24,11 @@ module.exports.postSingUp = async (req, res) => {
             ...createTokens(user)
         });
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        next(err);
     }
 }
 
-module.exports.postLogin = async (req, res) => {
+module.exports.postLogin = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
@@ -38,7 +38,29 @@ module.exports.postLogin = async (req, res) => {
             user,
             ...createTokens(user)
         });
-    } catch (error) {
-        res.status(401).json({ error: error.message });
+    } catch (err) {
+        next(err);
     }
+}
+
+module.exports.refreshToken = (req, res, next) => {
+    const authHeader = req.get('authorization');
+
+    if (!authHeader) throw new Error('Authorization header missing');
+
+    // get auth type and token from header
+    const [type, token] = authHeader.split(' ');
+
+    // check if token is of Bearer type
+    if (type != 'Bearer') throw new Error('Authorization method must be of type Bearer');
+
+    jwt.verify(token, process.env.REFRESH_SECRET, async (err, decoded) => {
+        if (err) {
+            next(err);
+        } else {
+            const user = await User.findById(decoded.id);
+        
+            res.status(200).json(createTokens(user));
+        }
+    })
 }
